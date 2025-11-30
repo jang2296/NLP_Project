@@ -1,0 +1,21 @@
+# Phase 3.3: KoELECTRA NER 학습 환경 의존성
+
+# PyTorch and Deep Learning
+torch>=2.0.0
+transformers>=4.30.0
+scikit-learn>=1.2.0
+numpy>=1.24.0
+
+# Google Cloud
+google-cloud-storage>=2.10.0
+google-cloud-firestore>=2.11.0
+
+# Logging and Monitoring
+tensorboard>=2.13.0
+tqdm>=4.65.0
+
+# KoNLPy for Korean NLP (optional, for advanced tokenization)
+konlpy>=0.6.0
+
+# Utilities
+python-dotenv>=1.0.0

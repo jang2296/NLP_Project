@@ -1,0 +1,70 @@
+# Phase 3.4: Vertex AI Custom Training Job 설정
+# KoELECTRA NER 모델 학습을 위한 Vertex AI 작업 구성
+
+# 작업 기본 정보
+displayName: koelectra-euphemism-ner-training
+jobSpec:
+  # Worker Pool 설정
+  workerPoolSpecs:
+    - machineSpec:
+        # GPU 사용 (NVIDIA Tesla T4)
+        machineType: n1-standard-4
+        acceleratorType: NVIDIA_TESLA_T4
+        acceleratorCount: 1
+
+      # 복제본 수
+      replicaCount: 1
+
+      # 컨테이너 설정
+      containerSpec:
+        imageUri: gcr.io/inspiring-list-465300-p6/k-euphemism-trainer:latest
+
+        # 학습 인자 (train_koelectra_ner.py 스크립트에 전달)
+        args:
+          - --train-data=gs://k-euphemism-data/training/train.jsonl
+          - --val-data=gs://k-euphemism-data/training/validation.jsonl
+          - --test-data=gs://k-euphemism-data/training/test.jsonl
+          - --batch-size=16
+          - --num-epochs=10
+          - --learning-rate=2e-5
+          - --warmup-steps=500
+          - --max-seq-length=128
+          - --early-stopping-patience=3
+          - --output-dir=/gcs/k-euphemism-models/checkpoints
+          - --checkpoint-dir=/gcs/k-euphemism-models/checkpoints
+          - --tensorboard-dir=/gcs/k-euphemism-models/tensorboard
+          - --gcs-model-path=gs://k-euphemism-models/koelectra_euphemism_ner
+
+        # 환경 변수
+        env:
+          - name: GOOGLE_CLOUD_PROJECT
+            value: inspiring-list-465300-p6
+          - name: TRANSFORMERS_CACHE
+            value: /app/.cache
+          - name: PYTHONUNBUFFERED
+            value: "1"
+
+  # TensorBoard 설정 (학습 모니터링)
+  tensorboard: projects/inspiring-list-465300-p6/locations/asia-northeast3/tensorboards/k-euphemism-training
+
+  # 서비스 계정
+  serviceAccount: 245053314944-compute@developer.gserviceaccount.com
+
+  # 베이스 출력 디렉토리
+  baseOutputDirectory:
+    outputUriPrefix: gs://k-euphemism-models/training_jobs
+
+# 리전 설정
+scheduling:
+  # 작업 타임아웃 (최대 24시간)
+  timeout: 86400s
+
+  # 재시도 정책
+  restartJobOnWorkerRestart: false
+
+# 라벨
+labels:
+  project: k-euphemism-detector
+  phase: phase-3-training
+  model: koelectra-ner
+  task: euphemism-detection

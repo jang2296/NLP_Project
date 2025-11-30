@@ -1,0 +1,132 @@
+{
+  "patterns": {
+    "company_anonymized": {
+      "regex": "[A-Z가-힣]\\s*모\\s*(기업|회사|그룹)",
+      "description": "익명화된 기업 ('S모 기업', 'K모 회사' 등)",
+      "confidence": 0.95,
+      "entity_candidates": {
+        "S모": ["삼성", "SK", "SPC"],
+        "K모": ["KT", "카카오", "기아"],
+        "L모": ["LG", "롯데", "LS"],
+        "H모": ["현대", "한화", "HD현대"],
+        "N모": ["네이버", "넥슨", "NC소프트"]
+      }
+    },
+    "person_initial": {
+      "regex": "[A-Z가-힣]\\s*씨|[가-힣]{1,2}모씨",
+      "description": "익명화된 인물 ('K씨', '김모씨' 등)",
+      "confidence": 0.90,
+      "entity_candidates": {}
+    },
+    "country_reference": {
+      "regex": "그\\s*나라|해당\\s*국가|이웃\\s*나라",
+      "description": "국가 간접 지칭 ('그 나라', '해당 국가' 등)",
+      "confidence": 0.85,
+      "context_keywords": {
+        "중국": ["반도체", "무역", "사드", "위안화", "베이징"],
+        "일본": ["엔화", "도쿄", "아베", "후쿠시마", "독도"],
+        "미국": ["달러", "백악관", "워싱턴", "나토", "FRB"],
+        "북한": ["김정은", "평양", "핵", "미사일", "개성"]
+      }
+    },
+    "initial_company": {
+      "regex": "[A-Z]\\s*(사|전자|모터스|케미칼|건설)",
+      "description": "이니셜 기업명 ('S사', 'L전자' 등)",
+      "confidence": 0.92,
+      "entity_candidates": {
+        "S사": ["삼성", "SK", "SPC"],
+        "L전자": ["LG전자"],
+        "K사": ["KT", "카카오", "기아"],
+        "H모터스": ["현대자동차"],
+        "S건설": ["삼성건설", "SK건설"]
+      }
+    },
+    "age_anonymized": {
+      "regex": "[0-9]{2}세\\s*[A-Z가-힣]\\s*씨",
+      "description": "나이+이니셜 ('35세 K씨' 등)",
+      "confidence": 0.88,
+      "entity_candidates": {}
+    },
+    "region_reference": {
+      "regex": "해당\\s*지역|그\\s*지역|문제의\\s*지역",
+      "description": "지역 간접 지칭 ('해당 지역', '그 지역' 등)",
+      "confidence": 0.80,
+      "entity_candidates": {}
+    },
+    "organization_anonymized": {
+      "regex": "[가-힣]{1,2}\\s*단체|해당\\s*기관|문제의\\s*조직",
+      "description": "단체/기관 익명화 ('김모 단체', '해당 기관' 등)",
+      "confidence": 0.82,
+      "entity_candidates": {}
+    }
+  },
+  "context_resolution_rules": {
+    "company_sector_keywords": {
+      "technology": ["반도체", "IT", "소프트웨어", "AI", "클라우드"],
+      "automotive": ["자동차", "전기차", "배터리", "모빌리티"],
+      "finance": ["금융", "은행", "증권", "보험", "카드"],
+      "retail": ["유통", "백화점", "편의점", "마트", "쇼핑"],
+      "construction": ["건설", "부동산", "건축", "인프라"],
+      "food": ["식품", "음료", "외식", "프랜차이즈"]
+    },
+    "negative_context_keywords": [
+      "횡령", "비리", "스캔들", "논란", "의혹", "사퇴", "구속", "기소"
+    ],
+    "positive_context_keywords": [
+      "투자", "성장", "확대", "출시", "개발", "협력", "제휴", "수상"
+    ]
+  },
+  "entity_knowledge_base": {
+    "companies": {
+      "삼성": {
+        "full_name": "삼성전자",
+        "sector": "technology",
+        "keywords": ["반도체", "스마트폰", "갤럭시", "메모리", "파운드리"],
+        "aliases": ["S모 기업", "S사", "S전자"]
+      },
+      "LG전자": {
+        "full_name": "LG전자",
+        "sector": "technology",
+        "keywords": ["가전", "TV", "에어컨", "스마트홈"],
+        "aliases": ["L전자", "L사"]
+      },
+      "현대자동차": {
+        "full_name": "현대자동차",
+        "sector": "automotive",
+        "keywords": ["자동차", "전기차", "수소차", "모빌리티"],
+        "aliases": ["H모터스", "H사"]
+      },
+      "SK": {
+        "full_name": "SK그룹",
+        "sector": "multiple",
+        "keywords": ["반도체", "통신", "배터리", "에너지"],
+        "aliases": ["S모 그룹", "S사"]
+      }
+    },
+    "countries": {
+      "중국": {
+        "full_name": "중화인민공화국",
+        "keywords": ["반도체", "무역", "위안화", "베이징", "시진핑"],
+        "aliases": ["그 나라", "이웃 나라", "해당 국가"]
+      },
+      "일본": {
+        "full_name": "일본국",
+        "keywords": ["엔화", "도쿄", "후쿠시마", "독도", "아베"],
+        "aliases": ["그 나라", "이웃 나라", "해당 국가"]
+      },
+      "북한": {
+        "full_name": "조선민주주의인민공화국",
+        "keywords": ["김정은", "평양", "핵", "미사일", "대남"],
+        "aliases": ["그 나라", "해당 국가", "북측"]
+      }
+    }
+  },
+  "detection_thresholds": {
+    "min_confidence": 0.70,
+    "high_confidence": 0.90,
+    "context_boost": 0.10,
+    "keyword_match_boost": 0.05
+  },
+  "version": "1.0.0",
+  "last_updated": "2025-10-13"
+}

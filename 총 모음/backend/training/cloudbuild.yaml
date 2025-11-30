@@ -1,0 +1,44 @@
+# Phase 3.4: Cloud Build 설정 - Training Container 빌드
+# KoELECTRA NER 학습 컨테이너 이미지 빌드 및 GCR 푸시
+
+steps:
+  # Step 1: Docker 이미지 빌드
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/${PROJECT_ID}/k-euphemism-trainer:latest'
+      - '-t'
+      - 'gcr.io/${PROJECT_ID}/k-euphemism-trainer:${BUILD_ID}'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    dir: 'backend/training'
+    timeout: 1200s  # 20분
+
+  # Step 2: 빌드된 이미지를 GCR에 푸시
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/${PROJECT_ID}/k-euphemism-trainer:latest'
+    timeout: 600s  # 10분
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/${PROJECT_ID}/k-euphemism-trainer:${BUILD_ID}'
+    timeout: 600s  # 10분
+
+# 빌드된 이미지
+images:
+  - 'gcr.io/${PROJECT_ID}/k-euphemism-trainer:latest'
+  - 'gcr.io/${PROJECT_ID}/k-euphemism-trainer:${BUILD_ID}'
+
+# 빌드 타임아웃
+timeout: 2400s  # 40분
+
+# 빌드 옵션
+options:
+  machineType: 'N1_HIGHCPU_8'
+  diskSizeGb: 100
+  logging: CLOUD_LOGGING_ONLY
